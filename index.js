@@ -9,8 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.kkdykse.mongodb.net/?retryWrites=true&w=majority`;
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient( process.env.MONGO_URI, {
+const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -98,6 +100,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.listen(PORT, () => {
-    console.log("listening for requests");
-})
+client.connect(err => {
+    if(err){ console.error(err); return false;}
+    // connection to mongo is successful, listen for requests
+    app.listen(PORT, () => {
+        console.log("listening for requests");
+    })
+});
